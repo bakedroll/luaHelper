@@ -15,19 +15,8 @@ namespace luaHelper
 
   LuaTableMappedObject::~LuaTableMappedObject() = default;
 
-  void LuaTableMappedObject::foreachElementDo(const std::function<void(luabridge::LuaRef& key, luabridge::LuaRef& value)> func)
+  int LuaTableMappedObject::getNumMappedObjects() const
   {
-    for (luabridge::Iterator it(luaRef()); !it.isNil(); ++it)
-    {
-      luabridge::LuaRef value = it.value();
-      luabridge::LuaRef key   = it.key();
-
-      func(key, value);
-    }
-  }
-
-  int LuaTableMappedObject::getNumElements() const
-  {
-    return static_cast<int>(m_elements.size());
+    return static_cast<int>(m_mappedObjects.size());
   }
 }

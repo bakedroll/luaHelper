@@ -1,11 +1,10 @@
 #pragma once
 
 #include <luaHelper/LuaTableMappedObject.h>
-#include <luaHelper/LuaMapTable.h>
 
 namespace luaHelper
 {
-  class LuaValueGroupTable : public LuaMapTable
+  class LuaValueGroupTable : public LuaTableMappedObject
   {
   public:
     using ValuesMap = std::map<std::string, float>;

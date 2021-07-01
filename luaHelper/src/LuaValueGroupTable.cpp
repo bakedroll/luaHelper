@@ -3,7 +3,7 @@
 namespace luaHelper
 {
   LuaValueGroupTable::LuaValueGroupTable(const luabridge::LuaRef& object, lua_State* luaState)
-    : LuaMapTable(object, luaState)
+    : LuaTableMappedObject(object, luaState)
   {
     assert_return(object.isTable());
   }
@@ -13,15 +13,15 @@ namespace luaHelper
   LuaValueGroupTable::ValuesMap LuaValueGroupTable::getMap()
   {
     ValuesMap map;
-    foreachElementDo([&](luabridge::LuaRef& key, luabridge::LuaRef& value)
+    iterateValues([&](const luabridge::Iterator& it)
     {
-      assert_return(key.isString());
+      checkType(it.key(), LUA_TSTRING);
 
-      if (!value.isNumber())
+      if (!it.value().isNumber())
       {
         return;
       }
-      map[key.tostring()] = float(value);
+      map[it.key().tostring()] = static_cast<float>(it.value());
     });
 
     return map;
@@ -44,7 +44,7 @@ namespace luaHelper
       return m_groups[name];
     }
 
-    const auto group = newMappedElement<LuaValueGroupTable>(name);
+    const auto group = newMappedObject<LuaValueGroupTable>(name);
     m_groups[name] = group;
     return group;
   }
