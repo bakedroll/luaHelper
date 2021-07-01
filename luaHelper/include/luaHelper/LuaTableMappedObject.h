@@ -20,13 +20,13 @@ extern "C"
 
 namespace luaHelper
 {
-  class LuaObjectMapper : public LuaTable
+  class LuaTableMappedObject : public LuaTable
   {
   public:
-    using Ptr = std::shared_ptr<LuaObjectMapper>;
+    using Ptr = std::shared_ptr<LuaTableMappedObject>;
 
-    explicit LuaObjectMapper(const luabridge::LuaRef& object, lua_State* luaState);
-    ~LuaObjectMapper() override;
+    explicit LuaTableMappedObject(const luabridge::LuaRef& object, lua_State* luaState);
+    ~LuaTableMappedObject() override;
 
     void foreachElementDo(std::function<void(luabridge::LuaRef& key, luabridge::LuaRef& value)> func);
 
@@ -39,7 +39,7 @@ namespace luaHelper
     int getNumElements() const;
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type>
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type>
     void foreachMappedElementDo(std::function<void(std::shared_ptr<LuaObject>&)> func)
     {
       for (auto element : m_elements)
@@ -50,7 +50,7 @@ namespace luaHelper
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type,
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type,
               typename KeyType>
     std::shared_ptr<LuaObject> addMappedElement(KeyType key, luabridge::LuaRef& ref)
     {
@@ -59,7 +59,7 @@ namespace luaHelper
     }
 
     template <typename LuaObject,
-        typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type>
+        typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type>
         std::shared_ptr<LuaObject> appendMappedElement(luabridge::LuaRef& ref)
     {
         luaRef().append(ref);
@@ -68,7 +68,7 @@ namespace luaHelper
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type,
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type,
               typename KeyType,
               typename... Args>
     std::shared_ptr<LuaObject> addUserDataElement(KeyType key, luabridge::LuaRef& ref, Args... args)
@@ -83,7 +83,7 @@ namespace luaHelper
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type,
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type,
               typename KeyType>
     std::shared_ptr<LuaObject> newMappedElement(KeyType key)
     {
@@ -92,7 +92,7 @@ namespace luaHelper
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type,
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type,
               typename KeyType>
     std::shared_ptr<LuaObject> makeMappedElement(KeyType key)
     {
@@ -101,7 +101,7 @@ namespace luaHelper
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type>
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type>
     std::shared_ptr<LuaObject> makeMappedElement(luabridge::LuaRef& key)
     {
       if (key.isNumber())
@@ -113,7 +113,7 @@ namespace luaHelper
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type>
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type>
     void makeAllMappedElements()
     {
       foreachElementDo([this](luabridge::LuaRef& key, luabridge::LuaRef& value)
@@ -123,7 +123,7 @@ namespace luaHelper
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type>
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type>
     std::shared_ptr<LuaObject> getMappedElement(const std::string& key) const
     {
       assert_return(m_elements.count(key) > 0, std::shared_ptr<LuaObject>());
@@ -131,14 +131,14 @@ namespace luaHelper
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type>
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type>
     std::shared_ptr<LuaObject> getMappedElement(int key) const
     {
       return getMappedElement<LuaObject>(std::to_string(key));
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type>
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type>
     std::shared_ptr<LuaObject> getMappedElement(luabridge::LuaRef& key) const
     {
       if (key.isNumber())
@@ -172,21 +172,21 @@ namespace luaHelper
     static std::string strKey(int key) { return std::to_string(key); }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type>
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type>
     void addToElementsMap(int key, std::shared_ptr<LuaObject>& elem)
     {
       m_elements[std::to_string(key)] = elem;
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type>
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type>
     void addToElementsMap(const std::string& key, std::shared_ptr<LuaObject>& elem)
     {
       m_elements[key] = elem;
     }
 
     template <typename LuaObject,
-              typename = typename std::enable_if<std::is_base_of<LuaObjectMapper, LuaObject>::value>::type,
+              typename = typename std::enable_if<std::is_base_of<LuaTableMappedObject, LuaObject>::value>::type,
               typename KeyType,
               typename... Args>
     std::shared_ptr<LuaObject> makeSharedAndAddElement(luabridge::LuaRef& ref, KeyType key, Args... args)

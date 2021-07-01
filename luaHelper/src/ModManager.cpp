@@ -41,12 +41,12 @@ void ModManager::loadModFromDirectory(const std::string& path)
 
   if (dataScriptExists)
   {
-    m_lua->loadScript(dataLuaFilepath.string());
+    m_lua->executeCodeFile(dataLuaFilepath.string());
   }
 
   if (controlScriptExists)
   {
-    m_lua->loadScript(controlLuaFilepath.string());
+    m_lua->executeCodeFile(controlLuaFilepath.string());
   }
 }
 

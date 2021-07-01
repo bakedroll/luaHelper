@@ -54,7 +54,7 @@ namespace luaHelper
 
   luabridge::LuaRef LuaStateManager::getObject(const char* name) const
   {
-    std::string namestr(name);
+    const std::string namestr(name);
     if (m->objectCache.count(namestr) > 0)
     {
       return *m->objectCache[namestr].get();
@@ -71,16 +71,16 @@ namespace luaHelper
 
     assert_return(!names.empty(), luabridge::LuaRef(m_state));
 
-    std::string       currentName = names[0];
-    luabridge::LuaRef first       = luabridge::getGlobal(m_state, currentName.c_str());
-    luabridge::LuaRef current     = first;
+    std::string             currentName = names[0];
+    const luabridge::LuaRef first       = luabridge::getGlobal(m_state, currentName.c_str());
+    luabridge::LuaRef       current     = first;
 
-    for (auto i = 1; i < names.size(); i++)
+    for (auto i = 1; i < static_cast<int>(names.size()); i++)
     {
       assert_return(current.isTable(), luabridge::LuaRef(m_state));
 
       currentName = names[i];
-      luabridge::LuaRef next = current[currentName.c_str()];
+      const luabridge::LuaRef next = current[currentName.c_str()];
       current = next;
     }
 
@@ -109,7 +109,7 @@ namespace luaHelper
 
   luabridge::LuaRef LuaStateManager::copyTable(const luabridge::LuaRef& table) const
   {
-    auto copyFunc = getGlobal("helper.deepcopy");
+    const auto copyFunc = getGlobal("helper.deepcopy");
     assert_return(copyFunc.isFunction(), luabridge::LuaRef(m_state));
 
     return copyFunc(table);
@@ -120,34 +120,14 @@ namespace luaHelper
     luabridge::setGlobal(m_state, ref, name);
   }
 
-  bool LuaStateManager::executeCode(const std::string& code)
+  bool LuaStateManager::executeCodeString(const std::string& code)
   {
-    auto success = true;
-    safeExecute([this, &success, &code]()
-    {
-      if (luaL_dostring(m_state, code.c_str()) != LUA_OK)
-      {
-        logErrorsFromStack();
-        success = false;
-      }
-    });
-
-    return success;
+    return executeCode(code, ExecuteMode::String);
   }
 
-  bool LuaStateManager::loadScript(const std::string& filename)
+  bool LuaStateManager::executeCodeFile(const std::string& filename)
   {
-    auto success = true;
-    safeExecute([this, &success, &filename]()
-      {
-        if (luaL_dofile(m_state, filename.c_str()) != LUA_OK)
-        {
-          logErrorsFromStack();
-          success = false;
-        }
-      });
-
-    return success;
+    return executeCode(filename, ExecuteMode::File);
   }
 
   std::string LuaStateManager::getStackTrace() const
@@ -182,7 +162,7 @@ namespace luaHelper
     return false;
   }
 
-  void LuaStateManager::safeExecute(std::function<void()> func)
+  void LuaStateManager::safeExecute(const std::function<void()>& func)
   {
     try
     {
@@ -221,5 +201,21 @@ namespace luaHelper
     }
 
     OSGH_LOG_FATAL(log);
+  }
+
+  bool LuaStateManager::executeCode(const std::string& fileOrString, ExecuteMode mode)
+  {
+    auto success = true;
+    safeExecute([this, mode, &success, &fileOrString]()
+    {
+      if (((mode == ExecuteMode::File) && (luaL_dofile(m_state, fileOrString.c_str()) != LUA_OK)) ||
+        ((mode == ExecuteMode::String) && (luaL_dostring(m_state, fileOrString.c_str()) != LUA_OK)))
+      {
+        logErrorsFromStack();
+        success = false;
+      }
+    });
+
+    return success;
   }
 }

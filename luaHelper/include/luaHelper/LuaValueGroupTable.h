@@ -1,6 +1,6 @@
 #pragma once
 
-#include <luaHelper/LuaObjectMapper.h>
+#include <luaHelper/LuaTableMappedObject.h>
 #include <luaHelper/LuaMapTable.h>
 
 namespace luaHelper

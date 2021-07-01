@@ -39,8 +39,8 @@ public:
 
   void setGlobal(const char* name, const luabridge::LuaRef& ref);
 
-  bool executeCode(const std::string& code);
-  bool loadScript(const std::string& filename);
+  bool executeCodeString(const std::string& code);
+  bool executeCodeFile(const std::string& filename);
 
   std::string getStackTrace() const;
   bool        checkIsType(const luabridge::LuaRef& ref, int luaType);
@@ -66,7 +66,7 @@ public:
     return std::make_shared<LuaObject>(table, m_state);
   }
 
-  void safeExecute(std::function<void()> func);
+  void safeExecute(const std::function<void()>& func);
 
   template <typename LuaClassType>
   void makeGlobalInstance(const std::string& name, LuaClassType* inst)
@@ -93,6 +93,14 @@ private:
 
   void logErrorsFromStack() const;
   void logLuaError(const std::string& message) const;
+
+  enum class ExecuteMode
+  {
+    File,
+    String
+  };
+
+  bool executeCode(const std::string& fileOrString, ExecuteMode mode);
 
 };
 

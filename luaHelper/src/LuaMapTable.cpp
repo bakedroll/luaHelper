@@ -3,7 +3,7 @@
 namespace luaHelper
 {
   LuaMapTable::LuaMapTable(const luabridge::LuaRef& object, lua_State* luaState)
-    : LuaObjectMapper(object, luaState)
+    : LuaTableMappedObject(object, luaState)
   {
   }
 

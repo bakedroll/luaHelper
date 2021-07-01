@@ -1,12 +1,12 @@
 #pragma once
 
-#include <luaHelper/LuaObjectMapper.h>
+#include <luaHelper/LuaTableMappedObject.h>
 
 #include <memory>
 
 namespace luaHelper
 {
-  class LuaValueDef : public LuaObjectMapper
+  class LuaValueDef : public LuaTableMappedObject
   {
   public:
     typedef std::shared_ptr<LuaValueDef> Ptr;

@@ -11,5 +11,6 @@ endif()
 project(luaHelper)
 
 add_subdirectory(luaHelper)
+add_subdirectory(luaHelperTest)
 
 make_projects()
