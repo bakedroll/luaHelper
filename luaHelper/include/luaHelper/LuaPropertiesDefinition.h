@@ -7,14 +7,13 @@
 
 namespace luaHelper
 {
-  class LuaPropertyDefinitions : public LuaBridgeDefinition
+  class LuaPropertiesDefinition : public LuaBridgeDefinition
   {
   public:
-    explicit LuaPropertyDefinitions(osgHelper::ioc::Injector& injector);
-    virtual ~LuaPropertyDefinitions();
+    explicit LuaPropertiesDefinition(osgHelper::ioc::Injector& injector);
+    ~LuaPropertiesDefinition() override;
 
-  private:
-    osgHelper::ioc::Injector& m_injector;
+  protected:
 
     template <typename T>
     void addProperty(lua_State* state, const char* name)
@@ -25,6 +24,9 @@ namespace luaHelper
         .addProperty(name, LuaStaticProperty<T>::get)
         .endNamespace();
     }
+
+  private:
+    osgHelper::ioc::Injector& m_injector;
 
   };
 }
