@@ -1,6 +1,7 @@
 #include "core/LuaHelperTestApplication.h"
 
 #include <luaHelper/LuaStateManager.h>
+#include <luaHelper/ModManager.h>
 
 #include <gtest/gtest.h>
 
@@ -16,10 +17,6 @@ int LuaHelperTestApplication::runTests(int argc, char** argv)
   testing::InitGoogleTest(&argc, argv);
   const auto result = RUN_ALL_TESTS();
 
-#ifdef _DEBUG
-  getchar();
-#endif
-
   return result;
 }
 
@@ -33,6 +30,7 @@ void LuaHelperTestApplication::registerComponents(osgHelper::ioc::InjectionConta
   registerEssentialComponents();
 
   container.registerSingletonType<luaHelper::LuaStateManager>();
+  container.registerSingletonType<luaHelper::ModManager>();
 }
 
 osgHelper::ioc::Injector* LuaHelperTestApplication::m_staticInjector = nullptr;

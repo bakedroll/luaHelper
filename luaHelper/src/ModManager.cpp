@@ -38,6 +38,7 @@ void ModManager::loadModFromDirectory(const std::string& path)
   }
 
   addPathToLuaPackage(std::filesystem::absolute(dir).string());
+  clearLoadedLuaPackages();
 
   if (dataScriptExists)
   {
@@ -57,26 +58,56 @@ void ModManager::scanDirectoryForMods(const std::string& path)
   {
     if (entry.is_directory())
     {
-      auto modPath = dir / entry.path();
-      loadModFromDirectory(modPath.string());
+      loadModFromDirectory(entry.path().string());
     }
   }
+}
+
+void ModManager::clearLoadedLuaPackages()
+{
+  m_lua->safeExecute([this]()
+  {
+    const luabridge::LuaRef loadedRef = m_lua->getObject("package.loaded");
+
+    if (!loadedRef.isTable())
+    {
+      OSGH_LOG_FATAL("Expected package.loaded to be a table");
+      return;
+    }
+
+    for (luabridge::Iterator it(loadedRef); !it.isNil(); ++it)
+    {
+      luabridge::LuaRef keyRef   = it.key();
+      luabridge::LuaRef valueRef = it.value();
+
+      if (valueRef.isBool() && keyRef.isString())
+      {
+        loadedRef[keyRef] = false;
+      }
+    }
+  });
 }
 
 void ModManager::addPathToLuaPackage(const std::string& path)
 {
   m_lua->safeExecute([this, path]()
   {
-    luabridge::LuaRef packageRef  = m_lua->getGlobal("package");
-    luabridge::LuaRef packagePath = packageRef["path"];
+    const luabridge::LuaRef packageRef = m_lua->getGlobal("package");
 
-    if (!packagePath.isString())
+    if (m_pathString.empty())
     {
-      OSGH_LOG_FATAL("Expected package.path to be a string");
-      return;
+      const luabridge::LuaRef packagePath = packageRef["path"];
+
+      if (!packagePath.isString())
+      {
+        OSGH_LOG_FATAL("Expected package.path to be a string");
+        return;
+      }
+
+      m_pathString = packagePath.tostring();
     }
 
-    auto packagePathStr = packagePath.tostring();
+    auto packagePathStr = m_pathString;
 
     std::filesystem::path fpath(path);
     fpath /= "?.lua";

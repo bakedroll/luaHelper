@@ -14,3 +14,7 @@ add_subdirectory(luaHelper)
 add_subdirectory(luaHelperTest)
 
 make_projects()
+
+if (MSVC)
+  osg_copy_additional_binaries(zlib)
+endif()

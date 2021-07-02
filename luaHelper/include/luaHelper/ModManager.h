@@ -25,7 +25,9 @@ namespace luaHelper
 
   private:
     LuaStateManager::Ptr m_lua;
+    std::string          m_pathString;
 
+    void clearLoadedLuaPackages();
     void addPathToLuaPackage(const std::string& path);
 
   };

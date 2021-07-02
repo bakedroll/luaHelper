@@ -12,4 +12,3 @@ require_project(osgHelper PATH osgHelper)
 
 add_source_directory(core)
 add_source_directory(tests)
-add_source_directory(mocks)
