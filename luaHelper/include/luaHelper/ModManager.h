@@ -11,7 +11,6 @@
 
 namespace luaHelper
 {
-
   class ModManager : public osg::Referenced
   {
   public:

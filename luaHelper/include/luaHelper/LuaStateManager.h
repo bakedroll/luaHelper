@@ -52,11 +52,11 @@ public:
   void safeExecute(const std::function<void()>& func);
 
   template <typename DefinitionType,
-            typename = typename std::enable_if<std::is_base_of<LuaBridgeDefinition, DefinitionType>::value>::type,
+            typename = typename std::enable_if<std::is_base_of<luaHelper::LuaBridgeDefinition, DefinitionType>::value>::type,
             typename... Args>
-  void registerDefinition(Args... args)
+  void registerDefinition(Args&&... args)
   {
-    DefinitionType(args...).registerDefinition(m_state);
+    DefinitionType(std::forward<Args>(args)...).registerDefinition(m_state);
   }
 
 private:
