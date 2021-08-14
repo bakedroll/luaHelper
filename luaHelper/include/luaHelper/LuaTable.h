@@ -25,18 +25,46 @@ namespace luaHelper
 
     luabridge::LuaRef& luaRef() const;
 
-    bool hasValue(const std::string& key) const;
-
     bool                      getBoolean(const std::string& key) const;
     std::string               getString(const std::string& key) const;
     std::shared_ptr<LuaTable> getTable(const std::string& key) const;
     luabridge::LuaRef         getFunction(const std::string& key) const;
-    luabridge::LuaRef         getUserData(const std::string& key) const;
+
+    bool                      getOptionalBoolean(const std::string& key, bool defaultValue) const;
+    std::string               getOptionalString(const std::string& key, const std::string& defaultValue) const;
+
+    template <typename Type>
+    Type getUserData(const std::string& key) const
+    {
+      return static_cast<Type>(checkType(getRefValue(key), LUA_TUSERDATA, key));
+    }
+
+    template <typename Type>
+    Type getOptionalUserData(const std::string& key, const Type& defaultValue) const
+    {
+      if (containsKey(key))
+      {
+        return getUserData<Type>(key);
+      }
+
+      return defaultValue;
+    }
 
     template<typename T>
     T getNumber(const std::string& key) const
     {
-        return checkType(getRefValue(key), LUA_TNUMBER, key);
+        return static_cast<T>(checkType(getRefValue(key), LUA_TNUMBER, key));
+    }
+
+    template<typename T>
+    T getOptionalNumber(const std::string& key, T defaultValue) const
+    {
+      if (containsKey(key))
+      {
+        return getNumber<T>(key);
+      }
+
+      return defaultValue;
     }
 
     template<typename KeyType>

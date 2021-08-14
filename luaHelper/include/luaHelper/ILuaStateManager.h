@@ -48,7 +48,7 @@ public:
   template <typename LuaObject>
   std::shared_ptr<LuaObject> createTableMappedObject(const luabridge::LuaRef& table)
   {
-    assert_return(table.isTable(), nullptr);
+    assert_return(checkIsType(table, LUA_TTABLE), nullptr);
     return std::make_shared<LuaObject>(table, getLuaState());
   }
 

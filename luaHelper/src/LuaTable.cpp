@@ -18,11 +18,6 @@ luabridge::LuaRef& LuaTable::luaRef() const
   return *m_ref;
 }
 
-bool LuaTable::hasValue(const std::string& key) const
-{
-  return !luaRef()[key].isNil();
-}
-
 bool LuaTable::getBoolean(const std::string& key) const
 {
   return checkType(getRefValue(key), LUA_TBOOLEAN, key);
@@ -43,9 +38,24 @@ luabridge::LuaRef LuaTable::getFunction(const std::string& key) const
   return checkType(getRefValue(key), LUA_TFUNCTION, key);
 }
 
-luabridge::LuaRef LuaTable::getUserData(const std::string& key) const
+bool LuaTable::getOptionalBoolean(const std::string& key, bool defaultValue) const
 {
-  return checkType(getRefValue(key), LUA_TUSERDATA, key);
+  if (containsKey(key))
+  {
+    return getBoolean(key);
+  }
+
+  return defaultValue;
+}
+
+std::string LuaTable::getOptionalString(const std::string& key, const std::string& defaultValue) const
+{
+  if (containsKey(key))
+  {
+    return getString(key);
+  }
+
+  return defaultValue;
 }
 
 void LuaTable::iterateValues(const IteratorFunc& iterFunc) const

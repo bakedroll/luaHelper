@@ -25,12 +25,12 @@ namespace luaHelper
     luabridge::LuaRef visible = object["visible"];
     luabridge::LuaRef group   = object["group"];
 
-    if (hasValue("visible"))
+    if (containsKey("visible"))
     {
       m->isVisible = getBoolean("visible");
     }
 
-    if (hasValue("group"))
+    if (containsKey("group"))
     {
       m->group = getString("group");
     }
