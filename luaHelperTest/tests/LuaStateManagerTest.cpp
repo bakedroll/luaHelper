@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <luaHelper/LuaStateManager.h>
+#include <luaHelper/ILuaStateManager.h>
 #include <luaHelper/LuaTableMappedObject.h>
 
 #include "core/LuaHelperTestApplication.h"
@@ -22,7 +22,7 @@ public:
 TEST(LuaStateManagerTest, TableHandling)
 {
   auto& injector = luaHelperTest::LuaHelperTestApplication::getInjector();
-  auto lua       = injector.inject<luaHelper::LuaStateManager>();
+  auto lua       = injector.inject<luaHelper::ILuaStateManager>();
 
   const luabridge::LuaRef table1 = lua->newTable();
   table1["key1"] = "string";
@@ -47,7 +47,7 @@ TEST(LuaStateManagerTest, TableHandling)
 TEST(LuaStateManagerTest, CodeExecution)
 {
   auto& injector = luaHelperTest::LuaHelperTestApplication::getInjector();
-  auto lua       = injector.inject<luaHelper::LuaStateManager>();
+  auto lua       = injector.inject<luaHelper::ILuaStateManager>();
 
   lua->executeCodeString("table2 = { key1 = \"string\", key2 = 3 }");
 
@@ -64,7 +64,7 @@ TEST(LuaStateManagerTest, CodeExecution)
 TEST(LuaStateManagerTest, LuaTableMappedObject)
 {
   auto& injector = luaHelperTest::LuaHelperTestApplication::getInjector();
-  auto lua       = injector.inject<luaHelper::LuaStateManager>();
+  auto lua       = injector.inject<luaHelper::ILuaStateManager>();
 
   lua->executeCodeString("table3 = { key1 = \"string\", key2 = 3 }");
   const luabridge::LuaRef table3 = lua->getGlobal("table3");

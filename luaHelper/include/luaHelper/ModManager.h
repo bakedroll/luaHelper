@@ -1,30 +1,24 @@
 #pragma once
 
-#include <luaHelper/LuaStateManager.h>
-
-#include <osg/ref_ptr>
-#include <osg/Referenced>
+#include <luaHelper/IModManager.h>
+#include <luaHelper/ILuaStateManager.h>
 
 #include <osgHelper/ioc/Injector.h>
 
-#include <string>
-
 namespace luaHelper
 {
-  class ModManager : public osg::Referenced
+  class ModManager : public IModManager
   {
   public:
-    using Ptr = osg::ref_ptr<ModManager>;
-
     explicit ModManager(osgHelper::ioc::Injector& injector);
-    virtual ~ModManager();
+    ~ModManager() override;
 
-    void loadModFromDirectory(const std::string& path);
-    void scanDirectoryForMods(const std::string& path);
+    void loadModFromDirectory(const std::string& path) override;
+    void scanDirectoryForMods(const std::string& path) override;
 
   private:
-    LuaStateManager::Ptr m_lua;
-    std::string          m_pathString;
+    ILuaStateManager::Ptr m_lua;
+    std::string           m_pathString;
 
     void clearLoadedLuaPackages();
     void addPathToLuaPackage(const std::string& path);

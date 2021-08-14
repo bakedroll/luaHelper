@@ -29,8 +29,8 @@ void LuaHelperTestApplication::registerComponents(osgHelper::ioc::InjectionConta
 {
   registerEssentialComponents();
 
-  container.registerSingletonType<luaHelper::LuaStateManager>();
-  container.registerSingletonType<luaHelper::ModManager>();
+  container.registerSingletonInterfaceType<luaHelper::ILuaStateManager, luaHelper::LuaStateManager>();
+  container.registerSingletonInterfaceType<luaHelper::IModManager, luaHelper::ModManager>();
 }
 
 osgHelper::ioc::Injector* LuaHelperTestApplication::m_staticInjector = nullptr;

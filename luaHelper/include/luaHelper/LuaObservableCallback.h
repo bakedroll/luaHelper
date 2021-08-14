@@ -10,7 +10,7 @@ namespace luaHelper
   class LuaObservableCallback : public LuaCallback
   {
   public:
-    LuaObservableCallback(const LuaStateManager::Ptr& lua, const typename osgHelper::Observable<T>::Ptr& observable)
+    LuaObservableCallback(const ILuaStateManager::Ptr& lua, const typename osgHelper::Observable<T>::Ptr& observable)
       : m_oldValue(observable->get())
     {
       m_observer = observable->connect([this, &lua](T value)

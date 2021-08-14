@@ -1,6 +1,6 @@
 #pragma once
 
-#include <luaHelper/LuaStateManager.h>
+#include <luaHelper/ILuaStateManager.h>
 
 #include <memory>
 #include <vector>
@@ -24,7 +24,7 @@ namespace luaHelper
     void addFunction(const luabridge::LuaRef& func);
 
     template<typename... Args>
-    void trigger(const LuaStateManager::Ptr& lua, Args... args) const
+    void trigger(const ILuaStateManager::Ptr& lua, Args... args) const
     {
       lua->safeExecute([this, &args...]()
       {

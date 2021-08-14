@@ -10,7 +10,7 @@ namespace luaHelper
       .endClass();
   }
 
-  LuaCallbackRegistry::LuaCallbackRegistry(const LuaStateManager::Ptr& lua)
+  LuaCallbackRegistry::LuaCallbackRegistry(const ILuaStateManager::Ptr& lua)
     : m_lua(lua)
   {
   }

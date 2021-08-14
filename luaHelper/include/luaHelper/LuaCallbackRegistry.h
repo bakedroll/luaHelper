@@ -2,7 +2,7 @@
 
 #include <luaHelper/LuaCallback.h>
 #include <luaHelper/LuaBridgeDefinition.h>
-#include <luaHelper/LuaStateManager.h>
+#include <luaHelper/ILuaStateManager.h>
 
 #include <osgHelper/Macros.h>
 #include <osg/Referenced>
@@ -27,7 +27,7 @@ namespace luaHelper
       void registerDefinition(lua_State* state) override;
     };
 
-    explicit LuaCallbackRegistry(const LuaStateManager::Ptr& lua);
+    explicit LuaCallbackRegistry(const ILuaStateManager::Ptr& lua);
 
     void luaOnEvent(int eventId, luabridge::LuaRef func);
 
@@ -47,6 +47,6 @@ namespace luaHelper
     using CallbackMap = std::map<int, LuaCallback::Ptr>;
 
     CallbackMap           m_callbacks;
-    LuaStateManager::Ptr  m_lua;
+    ILuaStateManager::Ptr m_lua;
   };
 }

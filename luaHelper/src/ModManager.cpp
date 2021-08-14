@@ -6,8 +6,8 @@ namespace luaHelper
 {
 
 ModManager::ModManager(osgHelper::ioc::Injector& injector)
-  : osg::Referenced()
-  , m_lua(injector.inject<LuaStateManager>())
+  : IModManager()
+  , m_lua(injector.inject<ILuaStateManager>())
 {
 }
 

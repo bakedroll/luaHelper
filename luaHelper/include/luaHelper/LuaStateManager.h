@@ -1,11 +1,9 @@
 #pragma once
 
-#include <luaHelper/LuaBridgeDefinition.h>
+#include <luaHelper/ILuaStateManager.h>
 
-#include <osgHelper/Macros.h>
 #include <osgHelper/ioc/Injector.h>
 
-#include <functional>
 #include <memory>
 #include <mutex>
 
@@ -16,48 +14,31 @@ extern "C"
 
 #include <LuaBridge/LuaBridge.h>
 
-#define MAKE_LUAREF_PTR(luaRef) std::make_shared<luabridge::LuaRef>(luaRef)
-
 namespace luaHelper
 {
-typedef std::shared_ptr<luabridge::LuaRef> LuaRefPtr;
 
-class LuaStateManager : public osg::Referenced
+class LuaStateManager : public ILuaStateManager
 {
 public:
-  using Ptr = osg::ref_ptr<LuaStateManager>;
-
   explicit LuaStateManager(osgHelper::ioc::Injector& injector);
-  ~LuaStateManager();
+  ~LuaStateManager() override;
 
-  luabridge::LuaRef getGlobal(const char* name) const;
-  luabridge::LuaRef getObject(const char* name) const;
-  luabridge::LuaRef newTable() const;
+  luabridge::LuaRef getGlobal(const char* name) const override;
+  luabridge::LuaRef getObject(const char* name) const override;
+  luabridge::LuaRef newTable() const override;
 
-  void setGlobal(const char* name, const luabridge::LuaRef& ref);
+  void setGlobal(const char* name, const luabridge::LuaRef& ref) override;
 
-  bool executeCodeString(const std::string& code);
-  bool executeCodeFile(const std::string& filename);
+  bool executeCodeString(const std::string& code) override;
+  bool executeCodeFile(const std::string& filename) override;
 
-  std::string getStackTrace() const;
-  bool        checkIsType(const luabridge::LuaRef& ref, int luaType);
+  std::string getStackTrace() const override;
+  bool        checkIsType(const luabridge::LuaRef& ref, int luaType) override;
 
-  template <typename LuaObject>
-  std::shared_ptr<LuaObject> createTableMappedObject(const luabridge::LuaRef& table)
-  {
-    assert_return(table.isTable(), nullptr);
-    return std::make_shared<LuaObject>(table, m_state);
-  }
+  void safeExecute(const std::function<void()>& func) override;
 
-  void safeExecute(const std::function<void()>& func);
-
-  template <typename DefinitionType,
-            typename = typename std::enable_if<std::is_base_of<luaHelper::LuaBridgeDefinition, DefinitionType>::value>::type,
-            typename... Args>
-  void registerDefinition(Args&&... args)
-  {
-    DefinitionType(std::forward<Args>(args)...).registerDefinition(m_state);
-  }
+protected:
+  lua_State* getLuaState() const override;
 
 private:
   struct Impl;

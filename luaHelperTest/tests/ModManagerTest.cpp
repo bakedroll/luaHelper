@@ -2,8 +2,8 @@
 
 #include "core/LuaHelperTestApplication.h"
 
-#include <luaHelper/ModManager.h>
-#include <luaHelper/LuaStateManager.h>
+#include <luaHelper/IModManager.h>
+#include <luaHelper/ILuaStateManager.h>
 
 #include <filesystem>
 #include <fstream>
@@ -18,8 +18,8 @@ void writeStringToFile(const std::string& filename, const std::string& str)
 TEST(ModManagerTest, Loading)
 {
   auto& injector = luaHelperTest::LuaHelperTestApplication::getInjector();
-  auto mods      = injector.inject<luaHelper::ModManager>();
-  const auto lua = injector.inject<luaHelper::LuaStateManager>();
+  auto mods      = injector.inject<luaHelper::IModManager>();
+  const auto lua = injector.inject<luaHelper::ILuaStateManager>();
 
   std::filesystem::create_directories("./mod1/subdir");
   std::filesystem::create_directories("./mods/mod2/control");
@@ -54,4 +54,8 @@ TEST(ModManagerTest, Loading)
   ASSERT_EQ(static_cast<int>(datatest), 2);
   ASSERT_EQ(static_cast<int>(mod2test), 3);
   ASSERT_EQ(static_cast<int>(mod3test), 4);
+
+  std::filesystem::remove_all("./mod1");
+  std::filesystem::remove_all("./mods/mod2");
+  std::filesystem::remove_all("./mods/mod3");
 }
