@@ -1,7 +1,7 @@
 #include <luaHelper/LuaStateManager.h>
 #include <luaHelper/LuaInvalidDataException.h>
 
-#include <osgHelper/ResourceManager.h>
+#include <osgHelper/IResourceManager.h>
 #include <osgHelper/Macros.h>
 
 #include <algorithm>
@@ -20,11 +20,11 @@ namespace luaHelper
   struct LuaStateManager::Impl
   {
     Impl(osgHelper::ioc::Injector& injector)
-      : resourceManager(injector.inject<osgHelper::ResourceManager>())
+      : resourceManager(injector.inject<osgHelper::IResourceManager>())
     {}
 
-    osg::ref_ptr<osgHelper::ResourceManager> resourceManager;
-    std::map<std::string, LuaRefPtr>         objectCache;
+    osg::ref_ptr<osgHelper::IResourceManager> resourceManager;
+    std::map<std::string, LuaRefPtr>          objectCache;
 
   };
 
