@@ -35,13 +35,13 @@ TEST(LuaStateManagerTest, TableHandling)
   const luabridge::LuaRef ref3 = lua->getObject("table1.key1");
   const luabridge::LuaRef ref4 = lua->getObject("table1.key2");
 
-  ASSERT_TRUE(ref1.isTable());
-  ASSERT_TRUE(ref2.isNil());
-  ASSERT_TRUE(ref3.isString());
-  ASSERT_TRUE(ref4.isNumber());
+  EXPECT_TRUE(ref1.isTable());
+  EXPECT_TRUE(ref2.isNil());
+  EXPECT_TRUE(ref3.isString());
+  EXPECT_TRUE(ref4.isNumber());
 
-  ASSERT_EQ(ref3.tostring(), "string");
-  ASSERT_EQ(static_cast<int>(ref4), 3);
+  EXPECT_EQ(ref3.tostring(), "string");
+  EXPECT_EQ(static_cast<int>(ref4), 3);
 }
 
 TEST(LuaStateManagerTest, CodeExecution)
@@ -54,11 +54,11 @@ TEST(LuaStateManagerTest, CodeExecution)
   const luabridge::LuaRef ref1 = lua->getObject("table1.key1");
   const luabridge::LuaRef ref2 = lua->getObject("table1.key2");
 
-  ASSERT_TRUE(ref1.isString());
-  ASSERT_TRUE(ref2.isNumber());
+  EXPECT_TRUE(ref1.isString());
+  EXPECT_TRUE(ref2.isNumber());
 
-  ASSERT_EQ(ref1.tostring(), "string");
-  ASSERT_EQ(static_cast<int>(ref2), 3);
+  EXPECT_EQ(ref1.tostring(), "string");
+  EXPECT_EQ(static_cast<int>(ref2), 3);
 }
 
 TEST(LuaStateManagerTest, LuaTableMappedObject)
@@ -71,6 +71,6 @@ TEST(LuaStateManagerTest, LuaTableMappedObject)
 
   auto mo1 = lua->createTableMappedObject<MappedObject1>(table3);
 
-  ASSERT_EQ(mo1->m_key1, "string");
-  ASSERT_EQ(mo1->m_key2, 3);
+  EXPECT_EQ(mo1->m_key1, "string");
+  EXPECT_EQ(mo1->m_key2, 3);
 }

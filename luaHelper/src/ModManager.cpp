@@ -15,7 +15,7 @@ ModManager::~ModManager() = default;
 
 void ModManager::loadModFromDirectory(const std::string& path)
 {
-  OSGH_LOG_INFO(std::string("Loading scripts from directory ") + path);
+  UTILS_LOG_INFO(std::string("Loading scripts from directory ") + path);
 
   const std::filesystem::path dir(path);
   std::filesystem::path       dataLuaFilepath(path);
@@ -32,7 +32,7 @@ void ModManager::loadModFromDirectory(const std::string& path)
 
   if (!dataScriptExists && !controlScriptExists)
   {
-    OSGH_LOG_WARN(std::string("Neither ") + dataLuaFilename + " nor " + controlLuaFilename +
+    UTILS_LOG_WARN(std::string("Neither ") + dataLuaFilename + " nor " + controlLuaFilename +
                   " exist in the directory " + path + ". No scripts were loaded");
     return;
   }
@@ -71,7 +71,7 @@ void ModManager::clearLoadedLuaPackages()
 
     if (!loadedRef.isTable())
     {
-      OSGH_LOG_FATAL("Expected package.loaded to be a table");
+      UTILS_LOG_FATAL("Expected package.loaded to be a table");
       return;
     }
 
@@ -100,7 +100,7 @@ void ModManager::addPathToLuaPackage(const std::string& path)
 
       if (!packagePath.isString())
       {
-        OSGH_LOG_FATAL("Expected package.path to be a string");
+        UTILS_LOG_FATAL("Expected package.path to be a string");
         return;
       }
 

@@ -4,7 +4,8 @@
 #include <luaHelper/LuaBridgeDefinition.h>
 #include <luaHelper/ILuaStateManager.h>
 
-#include <osgHelper/Macros.h>
+#include <utilsLib/Utils.h>
+
 #include <osg/Referenced>
 
 extern "C"

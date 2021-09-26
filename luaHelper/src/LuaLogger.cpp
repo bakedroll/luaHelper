@@ -1,6 +1,6 @@
 #include <luaHelper/LuaLogger.h>
 
-#include <osgHelper/LogManager.h>
+#include <utilsLib/Utils.h>
 
 namespace luaHelper
 {
@@ -14,22 +14,22 @@ LuaLogger::~LuaLogger() = default;
 
 void LuaLogger::lua_debug(std::string message)
 {
-  OSGH_LOG_DEBUG(message);
+  UTILS_LOG_DEBUG(message);
 }
 
 void LuaLogger::lua_info(std::string message)
 {
-  OSGH_LOG_INFO(message);
+  UTILS_LOG_INFO(message);
 }
 
 void LuaLogger::lua_warn(std::string message)
 {
-  OSGH_LOG_WARN(message);
+  UTILS_LOG_WARN(message);
 }
 
 void LuaLogger::lua_fatal(std::string message)
 {
-  OSGH_LOG_FATAL(message);
+  UTILS_LOG_FATAL(message);
 }
 
 }

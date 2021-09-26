@@ -3,6 +3,8 @@
 #include <luaHelper/LuaStateManager.h>
 #include <luaHelper/ModManager.h>
 
+#include <utilsLib/LoggingManager.h>
+
 #include <gtest/gtest.h>
 
 namespace luaHelperTest
@@ -10,9 +12,10 @@ namespace luaHelperTest
 
 int LuaHelperTestApplication::runTests(int argc, char** argv)
 {
-  setupIOC();
+  utilsLib::ILoggingManager::create<utilsLib::LoggingManager>();
 
-  m_staticInjector = &injector();
+  m_staticInjector = std::make_unique<osgHelper::ioc::Injector>(m_container);
+  registerComponents(m_container);
 
   testing::InitGoogleTest(&argc, argv);
   const auto result = RUN_ALL_TESTS();
@@ -27,12 +30,10 @@ osgHelper::ioc::Injector& LuaHelperTestApplication::getInjector()
 
 void LuaHelperTestApplication::registerComponents(osgHelper::ioc::InjectionContainer& container)
 {
-  registerEssentialComponents();
-
   container.registerSingletonInterfaceType<luaHelper::ILuaStateManager, luaHelper::LuaStateManager>();
   container.registerSingletonInterfaceType<luaHelper::IModManager, luaHelper::ModManager>();
 }
 
-osgHelper::ioc::Injector* LuaHelperTestApplication::m_staticInjector = nullptr;
+std::unique_ptr<osgHelper::ioc::Injector> LuaHelperTestApplication::m_staticInjector;
 
 }

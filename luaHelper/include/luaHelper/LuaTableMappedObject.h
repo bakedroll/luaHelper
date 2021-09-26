@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include <osgHelper/Macros.h>
+#include <utilsLib/Utils.h>
 
 extern "C"
 {

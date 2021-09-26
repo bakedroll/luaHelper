@@ -24,7 +24,7 @@ public:
   ~LuaStateManager() override;
 
   luabridge::LuaRef getGlobal(const char* name) const override;
-  luabridge::LuaRef getObject(const char* name) const override;
+  luabridge::LuaRef getObject(const char* name) override;
   luabridge::LuaRef newTable() const override;
 
   void setGlobal(const char* name, const luabridge::LuaRef& ref) override;
@@ -41,8 +41,7 @@ protected:
   lua_State* getLuaState() const override;
 
 private:
-  struct Impl;
-  std::unique_ptr<Impl> m;
+  std::map<std::string, LuaRefPtr> m_objectCache;
 
   lua_State* m_state;
 

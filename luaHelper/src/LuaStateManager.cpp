@@ -16,20 +16,9 @@ extern "C"
 
 namespace luaHelper
 {
-struct LuaStateManager::Impl
-{
-  Impl(osgHelper::ioc::Injector& injector)
-    : resourceManager(injector.inject<osgHelper::IResourceManager>())
-  {}
-
-  osg::ref_ptr<osgHelper::IResourceManager> resourceManager;
-  std::map<std::string, LuaRefPtr>          objectCache;
-
-};
 
 LuaStateManager::LuaStateManager(osgHelper::ioc::Injector& injector)
   : ILuaStateManager()
-  , m(new Impl(injector))
 {
   std::lock_guard<std::recursive_mutex> lock(m_luaLock);
 
@@ -41,7 +30,7 @@ LuaStateManager::LuaStateManager(osgHelper::ioc::Injector& injector)
 LuaStateManager::~LuaStateManager()
 {
   std::lock_guard<std::recursive_mutex> lock(m_luaLock);
-  m->objectCache.clear();
+  m_objectCache.clear();
 
   lua_close(m_state);
 }
@@ -51,12 +40,12 @@ luabridge::LuaRef LuaStateManager::getGlobal(const char* name) const
   return luabridge::getGlobal(m_state, name);
 }
 
-luabridge::LuaRef LuaStateManager::getObject(const char* name) const
+luabridge::LuaRef LuaStateManager::getObject(const char* name)
 {
   const std::string namestr(name);
-  if (m->objectCache.count(namestr) > 0)
+  if (m_objectCache.count(namestr) > 0)
   {
-    return *m->objectCache[namestr].get();
+    return *m_objectCache.at(namestr).get();
   }
 
   std::vector<std::string> names;
@@ -83,7 +72,7 @@ luabridge::LuaRef LuaStateManager::getObject(const char* name) const
     current = next;
   }
 
-  m->objectCache[namestr] = MAKE_LUAREF_PTR(current);
+  m_objectCache[namestr] = MAKE_LUAREF_PTR(current);
   return current;
 }
 
@@ -134,7 +123,7 @@ bool LuaStateManager::checkIsType(const luabridge::LuaRef& ref, int luaType)
 
   std::string message = "Lua typecheck failed\n";
   message.append(getStackTrace());
-  OSGH_LOG_WARN(message);
+  UTILS_LOG_WARN(message);
 
   return false;
 }
@@ -182,7 +171,7 @@ void LuaStateManager::logLuaError(const std::string& message) const
     log.append(stacktrace);
   }
 
-  OSGH_LOG_FATAL(log);
+  UTILS_LOG_FATAL(log);
 }
 
 bool LuaStateManager::executeCode(const std::string& fileOrString, ExecuteMode mode)

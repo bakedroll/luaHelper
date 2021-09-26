@@ -1,5 +1,9 @@
 #pragma once
 
+#include <osgHelper/ioc/PointerTypeDefinition.h>
+#include <osgHelper/ioc/InjectionContainer.h>
+#include <osgHelper/ioc/Injector.h>
+
 #include <osgHelper/GameApplication.h>
 
 namespace luaHelperTest
@@ -13,9 +17,10 @@ public:
   static osgHelper::ioc::Injector& getInjector();
 
 protected:
-  void registerComponents(osgHelper::ioc::InjectionContainer& container) override;
+  void registerComponents(osgHelper::ioc::InjectionContainer& container);
 
-  static osgHelper::ioc::Injector* m_staticInjector;
+  static std::unique_ptr<osgHelper::ioc::Injector> m_staticInjector;
+  osgHelper::ioc::InjectionContainer               m_container;
 };
 
 }

@@ -2,7 +2,7 @@
 
 #include <luaHelper/LuaBridgeDefinition.h>
 
-#include <osgHelper/Macros.h>
+#include <utilsLib/Utils.h>
 
 #include <osg/Referenced>
 #include <osg/ref_ptr>
@@ -32,7 +32,7 @@ public:
   virtual ~ILuaStateManager() = default;
 
   virtual luabridge::LuaRef getGlobal(const char* name) const = 0;
-  virtual luabridge::LuaRef getObject(const char* name) const = 0;
+  virtual luabridge::LuaRef getObject(const char* name) = 0;
   virtual luabridge::LuaRef newTable() const = 0;
 
   virtual void setGlobal(const char* name, const luabridge::LuaRef& ref) = 0;

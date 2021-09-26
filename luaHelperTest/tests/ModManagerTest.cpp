@@ -45,15 +45,15 @@ TEST(ModManagerTest, Loading)
   const luabridge::LuaRef mod2test    = lua->getGlobal("mod2test");
   const luabridge::LuaRef mod3test    = lua->getGlobal("mod3test");
 
-  ASSERT_TRUE(controltest.isNumber());
-  ASSERT_TRUE(datatest.isNumber());
-  ASSERT_TRUE(mod2test.isNumber());
-  ASSERT_TRUE(mod3test.isNumber());
+  EXPECT_TRUE(controltest.isNumber());
+  EXPECT_TRUE(datatest.isNumber());
+  EXPECT_TRUE(mod2test.isNumber());
+  EXPECT_TRUE(mod3test.isNumber());
 
-  ASSERT_EQ(static_cast<int>(controltest), 1);
-  ASSERT_EQ(static_cast<int>(datatest), 2);
-  ASSERT_EQ(static_cast<int>(mod2test), 3);
-  ASSERT_EQ(static_cast<int>(mod3test), 4);
+  EXPECT_EQ(static_cast<int>(controltest), 1);
+  EXPECT_EQ(static_cast<int>(datatest), 2);
+  EXPECT_EQ(static_cast<int>(mod2test), 3);
+  EXPECT_EQ(static_cast<int>(mod3test), 4);
 
   std::filesystem::remove_all("./mod1");
   std::filesystem::remove_all("./mods/mod2");
