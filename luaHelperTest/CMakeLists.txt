@@ -12,3 +12,5 @@ require_project(utilsLib PATH utilsLib)
 
 add_source_directory(core)
 add_source_directory(tests)
+
+add_project_definitions(-DQT_NO_VERSION_TAGGING)
