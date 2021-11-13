@@ -15,84 +15,84 @@ extern "C"
 namespace luaHelper
 {
 
-  class LuaTable
+class LuaTable
+{
+public:
+  using IteratorFunc = std::function<void(const luabridge::Iterator&)>;
+
+  LuaTable(const luabridge::LuaRef& object, lua_State* luaState);
+  virtual ~LuaTable();
+
+  luabridge::LuaRef& luaRef() const;
+
+  bool                      getBoolean(const std::string& key) const;
+  std::string               getString(const std::string& key) const;
+  std::shared_ptr<LuaTable> getTable(const std::string& key) const;
+  luabridge::LuaRef         getFunction(const std::string& key) const;
+
+  bool                      getOptionalBoolean(const std::string& key, bool defaultValue) const;
+  std::string               getOptionalString(const std::string& key, const std::string& defaultValue) const;
+
+  template <typename Type>
+  Type getUserData(const std::string& key) const
   {
-  public:
-    using IteratorFunc = std::function<void(const luabridge::Iterator&)>;
+    return static_cast<Type>(checkType(getRefValue(key), LUA_TUSERDATA, key));
+  }
 
-    LuaTable(const luabridge::LuaRef& object, lua_State* luaState);
-    virtual ~LuaTable();
-
-    luabridge::LuaRef& luaRef() const;
-
-    bool                      getBoolean(const std::string& key) const;
-    std::string               getString(const std::string& key) const;
-    std::shared_ptr<LuaTable> getTable(const std::string& key) const;
-    luabridge::LuaRef         getFunction(const std::string& key) const;
-
-    bool                      getOptionalBoolean(const std::string& key, bool defaultValue) const;
-    std::string               getOptionalString(const std::string& key, const std::string& defaultValue) const;
-
-    template <typename Type>
-    Type getUserData(const std::string& key) const
+  template <typename Type>
+  Type getOptionalUserData(const std::string& key, const Type& defaultValue) const
+  {
+    if (containsKey(key))
     {
-      return static_cast<Type>(checkType(getRefValue(key), LUA_TUSERDATA, key));
+      return getUserData<Type>(key);
     }
 
-    template <typename Type>
-    Type getOptionalUserData(const std::string& key, const Type& defaultValue) const
-    {
-      if (containsKey(key))
-      {
-        return getUserData<Type>(key);
-      }
+    return defaultValue;
+  }
 
-      return defaultValue;
+  template<typename T>
+  T getNumber(const std::string& key) const
+  {
+      return static_cast<T>(checkType(getRefValue(key), LUA_TNUMBER, key));
+  }
+
+  template<typename T>
+  T getOptionalNumber(const std::string& key, T defaultValue) const
+  {
+    if (containsKey(key))
+    {
+      return getNumber<T>(key);
     }
 
-    template<typename T>
-    T getNumber(const std::string& key) const
-    {
-        return static_cast<T>(checkType(getRefValue(key), LUA_TNUMBER, key));
-    }
+    return defaultValue;
+  }
 
-    template<typename T>
-    T getOptionalNumber(const std::string& key, T defaultValue) const
-    {
-      if (containsKey(key))
-      {
-        return getNumber<T>(key);
-      }
+  template<typename KeyType>
+  bool containsKey(const KeyType& key) const
+  {
+    return !luaRef()[key].isNil();
+  }
 
-      return defaultValue;
-    }
+  template<typename KeyType>
+  void setValue(const KeyType& key, const luabridge::LuaRef& elem)
+  {
+    luaRef()[key] = elem;
+  }
 
-    template<typename KeyType>
-    bool containsKey(const KeyType& key) const
-    {
-      return !luaRef()[key].isNil();
-    }
+  void iterateValues(const IteratorFunc& iterFunc) const;
 
-    template<typename KeyType>
-    void setValue(const KeyType& key, const luabridge::LuaRef& elem)
-    {
-      luaRef()[key] = elem;
-    }
+protected:
+  lua_State*        luaState() const;
+  luabridge::LuaRef getRefValue(const std::string& key) const;
 
-    void iterateValues(const IteratorFunc& iterFunc) const;
+  static const luabridge::LuaRef& checkType(const luabridge::LuaRef& ref,
+                                            int type,
+                                            const std::string& key = "");
 
-  protected:
-    lua_State*        luaState() const;
-    luabridge::LuaRef getRefValue(const std::string& key) const;
+private:
+  std::unique_ptr<luabridge::LuaRef> m_ref;
+  lua_State*                         m_luaState;
 
-    static const luabridge::LuaRef& checkType(const luabridge::LuaRef& ref,
-                                              int type,
-                                              const std::string& key = "");
-
-  private:
-    std::unique_ptr<luabridge::LuaRef> m_ref;
-    lua_State*                         m_luaState;
-
-  };
+};
 
 }
