@@ -12,6 +12,8 @@ extern "C"
 
 #include <LuaBridge/LuaBridge.h>
 
+#include <luaHelper/LuaEnum.h>
+
 namespace luaHelper
 {
 
@@ -67,6 +69,23 @@ public:
     return defaultValue;
   }
 
+  template<typename TEnum>
+  typename LuaEnum<TEnum>::Type getEnumValue(const std::string& key)
+  {
+    return LuaEnum<TEnum>::getMappedValue(getString(key));
+  }
+
+  template<typename TEnum>
+  typename LuaEnum<TEnum>::Type getOptionalEnumValue(const std::string& key, typename LuaEnum<TEnum>::Type defaultValue)
+  {
+    if (containsKey(key))
+    {
+      return LuaEnum<TEnum>::getMappedValue(getString(key));
+    }
+
+    return defaultValue;
+  }
+
   template<typename KeyType>
   bool containsKey(const KeyType& key) const
   {
@@ -77,6 +96,12 @@ public:
   void setValue(const KeyType& key, const luabridge::LuaRef& elem)
   {
     luaRef()[key] = elem;
+  }
+
+  template<typename TEnum, typename KeyType>
+  void setEnumValue(const KeyType& key, typename LuaEnum<TEnum>::Type value)
+  {
+    setValue(key, LuaEnum<TEnum>::getMappedString(value));
   }
 
   void iterateValues(const IteratorFunc& iterFunc) const;
