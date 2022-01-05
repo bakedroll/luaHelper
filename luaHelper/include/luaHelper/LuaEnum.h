@@ -13,8 +13,6 @@ template <typename T>
 class LuaEnum
 {
 public:
-  using Type = T;
-
   static void registerValue(T value, const std::string& mappedString)
   {
     m_valueStringMap[value] = mappedString;

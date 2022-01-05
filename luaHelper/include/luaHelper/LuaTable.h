@@ -70,13 +70,13 @@ public:
   }
 
   template<typename TEnum>
-  typename LuaEnum<TEnum>::Type getEnumValue(const std::string& key)
+  TEnum getEnumValue(const std::string& key)
   {
     return LuaEnum<TEnum>::getMappedValue(getString(key));
   }
 
   template<typename TEnum>
-  typename LuaEnum<TEnum>::Type getOptionalEnumValue(const std::string& key, typename LuaEnum<TEnum>::Type defaultValue)
+  TEnum getOptionalEnumValue(const std::string& key, TEnum defaultValue)
   {
     if (containsKey(key))
     {
@@ -99,7 +99,7 @@ public:
   }
 
   template<typename TEnum, typename KeyType>
-  void setEnumValue(const KeyType& key, typename LuaEnum<TEnum>::Type value)
+  void setEnumValue(const KeyType& key, TEnum value)
   {
     setValue(key, LuaEnum<TEnum>::getMappedString(value));
   }
