@@ -18,6 +18,12 @@ void ModManager::loadModFromDirectory(const std::string& path)
   UTILS_LOG_INFO(std::string("Loading scripts from directory ") + path);
 
   const std::filesystem::path dir(path);
+  if (!std::filesystem::exists(dir))
+  {
+    UTILS_LOG_WARN("Directory '" + path + "' does not exist.");
+    return;
+  }
+
   std::filesystem::path       dataLuaFilepath(path);
   std::filesystem::path       controlLuaFilepath(path);
 
@@ -54,6 +60,12 @@ void ModManager::loadModFromDirectory(const std::string& path)
 void ModManager::scanDirectoryForMods(const std::string& path)
 {
   const std::filesystem::path dir(path);
+  if (!std::filesystem::exists(dir))
+  {
+    UTILS_LOG_WARN("Directory '" + path + "' does not exist.");
+    return;
+  }
+
   for (auto& entry : std::filesystem::directory_iterator(path))
   {
     if (entry.is_directory())
