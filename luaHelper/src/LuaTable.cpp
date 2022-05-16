@@ -58,11 +58,30 @@ std::string LuaTable::getOptionalString(const std::string& key, const std::strin
   return defaultValue;
 }
 
+std::shared_ptr<LuaTable> LuaTable::getOptionalTable(const std::string& key) const
+{
+  if (containsKey(key))
+  {
+    return getTable(key);
+  }
+
+  return nullptr;
+}
+
 void LuaTable::iterateValues(const IteratorFunc& iterFunc) const
 {
   for (luabridge::Iterator it(*m_ref); !it.isNil(); ++it)
   {
     iterFunc(it);
+  }
+}
+
+void LuaTable::iterateTables(const TablesIteratorFunc& iterFunc) const
+{
+  for (luabridge::Iterator it(*m_ref); !it.isNil(); ++it)
+  {
+    const auto table = std::make_shared<LuaTable>(checkType(it.value(), LUA_TTABLE), m_luaState);
+    iterFunc(table);
   }
 }
 
@@ -86,7 +105,7 @@ const luabridge::LuaRef& LuaTable::checkType(const luabridge::LuaRef& ref, int t
 {
   if (ref.type() != type)
   {
-    throw LuaInvalidDataException(key.empty() ? "Value in array has wrong type"
+    throw LuaInvalidDataException(key.empty() ? "Value in array has wrong type."
                                               : std::string("Value '") + key + "' has wrong type.");
   }
 

@@ -21,6 +21,7 @@ class LuaTable
 {
 public:
   using IteratorFunc = std::function<void(const luabridge::Iterator&)>;
+  using TablesIteratorFunc = std::function<void(const std::shared_ptr<LuaTable>&)>;
 
   LuaTable(const luabridge::LuaRef& object, lua_State* luaState);
   virtual ~LuaTable();
@@ -34,6 +35,7 @@ public:
 
   bool                      getOptionalBoolean(const std::string& key, bool defaultValue) const;
   std::string               getOptionalString(const std::string& key, const std::string& defaultValue) const;
+  std::shared_ptr<LuaTable> getOptionalTable(const std::string& key) const;
 
   template <typename Type>
   Type getUserData(const std::string& key) const
@@ -105,6 +107,7 @@ public:
   }
 
   void iterateValues(const IteratorFunc& iterFunc) const;
+  void iterateTables(const TablesIteratorFunc& iterFunc) const;
 
 protected:
   lua_State*        luaState() const;
