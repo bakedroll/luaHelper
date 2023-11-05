@@ -57,7 +57,7 @@ public:
   template<typename T>
   T getNumber(const std::string& key) const
   {
-      return static_cast<T>(checkType(getRefValue(key), LUA_TNUMBER, key));
+    return static_cast<T>(checkType(getRefValue(key), LUA_TNUMBER, key));
   }
 
   template<typename T>
