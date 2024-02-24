@@ -21,6 +21,8 @@ public:
   virtual void loadModFromDirectory(const std::string& path) = 0;
   virtual void scanDirectoryForMods(const std::string& path) = 0;
 
+  virtual void setCustomFilesystemExists(const std::function<bool(const std::string&)>& existsFunc) = 0;
+
 };
 
 }

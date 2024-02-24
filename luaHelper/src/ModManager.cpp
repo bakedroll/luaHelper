@@ -5,9 +5,16 @@
 namespace luaHelper
 {
 
-ModManager::ModManager(osgHelper::ioc::Injector& injector)
-  : IModManager()
-  , m_lua(injector.inject<ILuaStateManager>())
+static bool filesystemExists(const std::string& path)
+{
+  const std::filesystem::path p(path);
+  return std::filesystem::exists(p);
+}
+
+ModManager::ModManager(osgHelper::ioc::Injector& injector) :
+  IModManager(),
+  m_lua(injector.inject<ILuaStateManager>()),
+  m_filesystemExistsFunc(filesystemExists)
 {
 }
 
@@ -16,25 +23,23 @@ ModManager::~ModManager() = default;
 void ModManager::loadModFromDirectory(const std::string& path)
 {
   UTILS_LOG_INFO(std::string("Loading scripts from directory ") + path);
-
-  const std::filesystem::path dir(path);
-  if (!std::filesystem::exists(dir))
+  if (!m_filesystemExistsFunc(path))
   {
     UTILS_LOG_WARN("Directory '" + path + "' does not exist.");
     return;
   }
 
-  std::filesystem::path       dataLuaFilepath(path);
-  std::filesystem::path       controlLuaFilepath(path);
+  std::filesystem::path dataLuaFilepath(path);
+  std::filesystem::path controlLuaFilepath(path);
 
   const std::string dataLuaFilename("data.lua");
   const std::string controlLuaFilename("control.lua");
 
-  dataLuaFilepath    /= dataLuaFilename;
+  dataLuaFilepath /= dataLuaFilename;
   controlLuaFilepath /= controlLuaFilename;
 
-  const auto dataScriptExists    = std::filesystem::exists(dataLuaFilepath);
-  const auto controlScriptExists = std::filesystem::exists(controlLuaFilepath);
+  const auto dataScriptExists = m_filesystemExistsFunc(dataLuaFilepath.string());
+  const auto controlScriptExists = m_filesystemExistsFunc(controlLuaFilepath.string());
 
   if (!dataScriptExists && !controlScriptExists)
   {
@@ -43,7 +48,7 @@ void ModManager::loadModFromDirectory(const std::string& path)
     return;
   }
 
-  addPathToLuaPackage(std::filesystem::absolute(dir).string());
+  addPathToLuaPackage(path);
   clearLoadedLuaPackages();
 
   if (dataScriptExists)
@@ -59,8 +64,7 @@ void ModManager::loadModFromDirectory(const std::string& path)
 
 void ModManager::scanDirectoryForMods(const std::string& path)
 {
-  const std::filesystem::path dir(path);
-  if (!std::filesystem::exists(dir))
+  if (!m_filesystemExistsFunc(path))
   {
     UTILS_LOG_WARN("Directory '" + path + "' does not exist.");
     return;
@@ -73,6 +77,11 @@ void ModManager::scanDirectoryForMods(const std::string& path)
       loadModFromDirectory(entry.path().string());
     }
   }
+}
+
+void ModManager::setCustomFilesystemExists(const std::function<bool(const std::string&)>& existsFunc)
+{
+  m_filesystemExistsFunc = existsFunc;
 }
 
 void ModManager::clearLoadedLuaPackages()

@@ -24,6 +24,7 @@ LuaStateManager::LuaStateManager(osgHelper::ioc::Injector& injector)
 
   m_state = luaL_newstate();
 
+  luaL_requiref(m_state, "package", luaopen_package, 1);
   luaL_openlibs(m_state);
 }
 
@@ -86,6 +87,35 @@ void LuaStateManager::setGlobal(const char* name, const luabridge::LuaRef& ref)
   luabridge::setGlobal(m_state, ref, name);
 }
 
+void LuaStateManager::setCustomFileLoader(const std::function<int(lua_State*, const char*)>& loaderFunc)
+{
+  m_customLoaderFunc = loaderFunc;
+}
+
+void LuaStateManager::setCustomPackageLoader(const std::function<int(lua_State*)>& loaderFunc)
+{
+  std::lock_guard<std::recursive_mutex> lock(m_luaLock);
+
+  m_customPackageLoader = loaderFunc;
+  auto* funcPtr = m_customPackageLoader.target<int(*)(lua_State*)>();
+
+  const auto packageRef = getGlobal("package");
+  if (!packageRef.isTable())
+  {
+    UTILS_LOG_ERROR("Lua table 'package' not found.");
+    return;
+  }
+
+  const auto searchersRef = packageRef["searchers"];
+  if (!searchersRef.isTable())
+  {
+    UTILS_LOG_ERROR("Lua table 'package.searchers' not found.");
+    return;
+  }
+
+  searchersRef.append(*funcPtr);
+}
+
 bool LuaStateManager::executeCodeString(const std::string& code)
 {
   return executeCode(code, ExecuteMode::String);
@@ -99,11 +129,17 @@ bool LuaStateManager::executeCodeFile(const std::string& filename)
 std::string LuaStateManager::getStackTrace() const
 {
   std::string result;
-  auto        lines = 0;
+  auto lines = 0;
 
   luaL_traceback(m_state, m_state, nullptr, 0);
   while (lua_gettop(m_state) > 0)
   {
+    if (!lua_isstring(m_state, -1))
+    {
+      lua_pop(m_state, 1);
+      continue;
+    }
+
     result.append(lua_tostring(m_state, -1));
     result.append("\n");
 
@@ -179,8 +215,24 @@ bool LuaStateManager::executeCode(const std::string& fileOrString, ExecuteMode m
   auto success = true;
   safeExecute([this, mode, &success, &fileOrString]()
   {
-    if (((mode == ExecuteMode::File) && (luaL_dofile(m_state, fileOrString.c_str()) != LUA_OK)) ||
-      ((mode == ExecuteMode::String) && (luaL_dostring(m_state, fileOrString.c_str()) != LUA_OK)))
+    auto result = 0;
+    if (mode == ExecuteMode::File)
+    {
+      if (m_customLoaderFunc)
+      {
+        result = m_customLoaderFunc(m_state, fileOrString.c_str());
+      }
+      else
+      {
+        result = luaL_dofile(m_state, fileOrString.c_str());
+      }
+    }
+    else if (mode == ExecuteMode::String)
+    {
+      result = luaL_dostring(m_state, fileOrString.c_str());
+    }
+
+    if (result != LUA_OK)
     {
       logErrorsFromStack();
       success = false;

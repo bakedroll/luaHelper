@@ -16,9 +16,13 @@ namespace luaHelper
     void loadModFromDirectory(const std::string& path) override;
     void scanDirectoryForMods(const std::string& path) override;
 
+    void setCustomFilesystemExists(const std::function<bool(const std::string&)>& existsFunc) override;
+
   private:
     ILuaStateManager::Ptr m_lua;
-    std::string           m_pathString;
+    std::string m_pathString;
+
+    std::function<bool(const std::string&)> m_filesystemExistsFunc;
 
     void clearLoadedLuaPackages();
     void addPathToLuaPackage(const std::string& path);

@@ -4,7 +4,6 @@
 
 #include <osgHelper/ioc/Injector.h>
 
-#include <memory>
 #include <mutex>
 
 extern "C"
@@ -29,11 +28,14 @@ public:
 
   void setGlobal(const char* name, const luabridge::LuaRef& ref) override;
 
+  void setCustomFileLoader(const std::function<int(lua_State*, const char*)>& loaderFunc) override;
+  void setCustomPackageLoader(const std::function<int(lua_State*)>& loaderFunc) override;
+
   bool executeCodeString(const std::string& code) override;
   bool executeCodeFile(const std::string& filename) override;
 
   std::string getStackTrace() const override;
-  bool        checkIsType(const luabridge::LuaRef& ref, int luaType) override;
+  bool checkIsType(const luabridge::LuaRef& ref, int luaType) override;
 
   void safeExecute(const std::function<void()>& func) override;
 
@@ -42,6 +44,8 @@ protected:
 
 private:
   std::map<std::string, LuaRefPtr> m_objectCache;
+  std::function<int(lua_State*, const char*)> m_customLoaderFunc;
+  std::function<int(lua_State*)> m_customPackageLoader;
 
   lua_State* m_state;
 
@@ -53,11 +57,12 @@ private:
   enum class ExecuteMode
   {
     File,
-    String
+    String,
+    CustomFileLoader
   };
 
   bool executeCode(const std::string& fileOrString, ExecuteMode mode);
 
 };
 
-}  // namespace luaHelper
+}

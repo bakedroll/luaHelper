@@ -14,6 +14,7 @@ extern "C"
 
 #include <LuaBridge/LuaBridge.h>
 
+#include <functional>
 #include <string>
 
 #define MAKE_LUAREF_PTR(luaRef) std::make_shared<luabridge::LuaRef>(luaRef)
@@ -37,11 +38,14 @@ public:
 
   virtual void setGlobal(const char* name, const luabridge::LuaRef& ref) = 0;
 
+  virtual void setCustomFileLoader(const std::function<int(lua_State*, const char*)>& loaderFunc) = 0;
+  virtual void setCustomPackageLoader(const std::function<int(lua_State*)>& loaderFunc) = 0;
+
   virtual bool executeCodeString(const std::string& code) = 0;
   virtual bool executeCodeFile(const std::string& filename) = 0;
 
   virtual std::string getStackTrace() const = 0;
-  virtual bool        checkIsType(const luabridge::LuaRef& ref, int luaType) = 0;
+  virtual bool checkIsType(const luabridge::LuaRef& ref, int luaType) = 0;
 
   virtual void safeExecute(const std::function<void()>& func) = 0;
 
