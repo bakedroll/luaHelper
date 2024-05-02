@@ -68,6 +68,16 @@ std::shared_ptr<LuaTable> LuaTable::getOptionalTable(const std::string& key) con
   return nullptr;
 }
 
+luabridge::LuaRef LuaTable::getOptionalFunction(const std::string& key) const
+{
+  if (containsKey(key))
+  {
+    return getFunction(key);
+  }
+
+  return luabridge::LuaRef(m_luaState);
+}
+
 void LuaTable::iterateValues(const IteratorFunc& iterFunc) const
 {
   for (luabridge::Iterator it(*m_ref); !it.isNil(); ++it)

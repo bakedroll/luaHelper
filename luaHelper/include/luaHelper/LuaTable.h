@@ -36,6 +36,7 @@ public:
   bool                      getOptionalBoolean(const std::string& key, bool defaultValue) const;
   std::string               getOptionalString(const std::string& key, const std::string& defaultValue) const;
   std::shared_ptr<LuaTable> getOptionalTable(const std::string& key) const;
+  luabridge::LuaRef         getOptionalFunction(const std::string& key) const;
 
   template <typename Type>
   Type getUserData(const std::string& key) const
