@@ -16,11 +16,11 @@ namespace luaHelper
   protected:
 
     template <typename T>
-    void addProperty(lua_State* state, const char* name)
+    void addProperty(lua_State* state, const char* name, const char* ns = "lua")
     {
       LuaStaticProperty<T>::set(m_injector.inject<T>().get());
       getGlobalNamespace(state)
-        .beginNamespace("lua")
+        .beginNamespace(ns)
         .addProperty(name, LuaStaticProperty<T>::get)
         .endNamespace();
     }
