@@ -25,6 +25,16 @@ namespace luaHelper
         .endNamespace();
     }
 
+    template <typename T>
+    void addProperty(lua_State* state, const char* name, T* ptr, const char* ns = "lua")
+    {
+      LuaStaticProperty<T>::set(ptr);
+      getGlobalNamespace(state)
+        .beginNamespace(ns)
+        .addProperty(name, LuaStaticProperty<T>::get)
+        .endNamespace();
+    }
+
   private:
     osgHelper::ioc::Injector& m_injector;
 
