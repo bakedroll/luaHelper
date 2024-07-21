@@ -29,6 +29,12 @@ class ILuaStateManager : public osg::Referenced
 public:
   using Ptr = osg::ref_ptr<ILuaStateManager>;
 
+  enum class RethrowErrors
+  {
+    YES,
+    NO
+  };
+
   ILuaStateManager() = default;
   virtual ~ILuaStateManager() = default;
 
@@ -41,13 +47,13 @@ public:
   virtual void setCustomFileLoader(const std::function<int(lua_State*, const char*)>& loaderFunc) = 0;
   virtual void setCustomPackageLoader(const std::function<int(lua_State*)>& loaderFunc) = 0;
 
-  virtual bool executeCodeString(const std::string& code) = 0;
-  virtual bool executeCodeFile(const std::string& filename) = 0;
+  virtual bool executeCodeString(const std::string& code, RethrowErrors rethrowErrors = RethrowErrors::NO) = 0;
+  virtual bool executeCodeFile(const std::string& filename, RethrowErrors rethrowErrors = RethrowErrors::NO) = 0;
 
   virtual std::string getStackTrace() const = 0;
   virtual bool checkIsType(const luabridge::LuaRef& ref, int luaType) = 0;
 
-  virtual void safeExecute(const std::function<void()>& func) = 0;
+  virtual void safeExecute(const std::function<void()>& func, RethrowErrors rethrowErrors = RethrowErrors::NO) = 0;
 
   template <typename LuaObject>
   std::shared_ptr<LuaObject> createTableMappedObject(const luabridge::LuaRef& table)

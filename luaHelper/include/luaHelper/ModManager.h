@@ -13,8 +13,8 @@ namespace luaHelper
     explicit ModManager(osgHelper::ioc::Injector& injector);
     ~ModManager() override;
 
-    void loadModFromDirectory(const std::string& path) override;
-    void scanDirectoryForMods(const std::string& path) override;
+    void loadModFromDirectory(const std::string& path, ILuaStateManager::RethrowErrors rethrowErrors) override;
+    void scanDirectoryForMods(const std::string& path, ILuaStateManager::RethrowErrors rethrowErrors) override;
 
     void setCustomFilesystemExists(const std::function<bool(const std::string&)>& existsFunc) override;
 

@@ -31,13 +31,13 @@ public:
   void setCustomFileLoader(const std::function<int(lua_State*, const char*)>& loaderFunc) override;
   void setCustomPackageLoader(const std::function<int(lua_State*)>& loaderFunc) override;
 
-  bool executeCodeString(const std::string& code) override;
-  bool executeCodeFile(const std::string& filename) override;
+  bool executeCodeString(const std::string& code, RethrowErrors rethrowErrors) override;
+  bool executeCodeFile(const std::string& filename, RethrowErrors rethrowErrors) override;
 
   std::string getStackTrace() const override;
   bool checkIsType(const luabridge::LuaRef& ref, int luaType) override;
 
-  void safeExecute(const std::function<void()>& func) override;
+  void safeExecute(const std::function<void()>& func, RethrowErrors rethrowErrors) override;
 
 protected:
   lua_State* getLuaState() const override;
@@ -51,7 +51,7 @@ private:
 
   std::recursive_mutex m_luaLock;
 
-  void logErrorsFromStack() const;
+  void logErrorsFromStack(bool throwOnError) const;
   void logLuaError(const std::string& message) const;
 
   enum class ExecuteMode
@@ -61,7 +61,7 @@ private:
     CustomFileLoader
   };
 
-  bool executeCode(const std::string& fileOrString, ExecuteMode mode);
+  bool executeCode(const std::string& fileOrString, ExecuteMode mode, RethrowErrors rethrowErrors);
 
 };
 

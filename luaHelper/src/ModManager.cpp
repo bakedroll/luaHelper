@@ -20,7 +20,7 @@ ModManager::ModManager(osgHelper::ioc::Injector& injector) :
 
 ModManager::~ModManager() = default;
 
-void ModManager::loadModFromDirectory(const std::string& path)
+void ModManager::loadModFromDirectory(const std::string& path, ILuaStateManager::RethrowErrors rethrowErrors)
 {
   UTILS_LOG_INFO(std::string("Loading scripts from directory ") + path);
   if (!m_filesystemExistsFunc(path))
@@ -53,16 +53,16 @@ void ModManager::loadModFromDirectory(const std::string& path)
 
   if (dataScriptExists)
   {
-    m_lua->executeCodeFile(dataLuaFilepath.string());
+    m_lua->executeCodeFile(dataLuaFilepath.string(), rethrowErrors);
   }
 
   if (controlScriptExists)
   {
-    m_lua->executeCodeFile(controlLuaFilepath.string());
+    m_lua->executeCodeFile(controlLuaFilepath.string(), rethrowErrors);
   }
 }
 
-void ModManager::scanDirectoryForMods(const std::string& path)
+void ModManager::scanDirectoryForMods(const std::string& path, ILuaStateManager::RethrowErrors rethrowErrors)
 {
   if (!m_filesystemExistsFunc(path))
   {
@@ -74,7 +74,7 @@ void ModManager::scanDirectoryForMods(const std::string& path)
   {
     if (entry.is_directory())
     {
-      loadModFromDirectory(entry.path().string());
+      loadModFromDirectory(entry.path().string(), rethrowErrors);
     }
   }
 }

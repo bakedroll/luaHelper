@@ -1,5 +1,6 @@
-#include <luaHelper/LuaStateManager.h>
+#include <luaHelper/LuaGenericException.h>
 #include <luaHelper/LuaInvalidDataException.h>
+#include <luaHelper/LuaStateManager.h>
 
 #include <osgHelper/IResourceManager.h>
 
@@ -116,14 +117,14 @@ void LuaStateManager::setCustomPackageLoader(const std::function<int(lua_State*)
   searchersRef.append(*funcPtr);
 }
 
-bool LuaStateManager::executeCodeString(const std::string& code)
+bool LuaStateManager::executeCodeString(const std::string& code, RethrowErrors rethrowErrors)
 {
-  return executeCode(code, ExecuteMode::String);
+  return executeCode(code, ExecuteMode::String, rethrowErrors);
 }
 
-bool LuaStateManager::executeCodeFile(const std::string& filename)
+bool LuaStateManager::executeCodeFile(const std::string& filename, RethrowErrors rethrowErrors)
 {
-  return executeCode(filename, ExecuteMode::File);
+  return executeCode(filename, ExecuteMode::File, rethrowErrors);
 }
 
 std::string LuaStateManager::getStackTrace() const
@@ -164,7 +165,7 @@ bool LuaStateManager::checkIsType(const luabridge::LuaRef& ref, int luaType)
   return false;
 }
 
-void LuaStateManager::safeExecute(const std::function<void()>& func)
+void LuaStateManager::safeExecute(const std::function<void()>& func, RethrowErrors rethrowErrors)
 {
   try
   {
@@ -174,10 +175,26 @@ void LuaStateManager::safeExecute(const std::function<void()>& func)
   catch (luabridge::LuaException& e)
   {
     logLuaError(e.what());
+    if (rethrowErrors == RethrowErrors::YES)
+    {
+      throw;
+    }
+  }
+  catch (LuaGenericException& e)
+  {
+    logLuaError(e.what());
+    if (rethrowErrors == RethrowErrors::YES)
+    {
+      throw;
+    }
   }
   catch (LuaInvalidDataException& e)
   {
     logLuaError(e.what());
+    if (rethrowErrors == RethrowErrors::YES)
+    {
+      throw;
+    }
   }
 }
 
@@ -186,7 +203,7 @@ lua_State* LuaStateManager::getLuaState() const
   return m_state;
 }
 
-void LuaStateManager::logErrorsFromStack() const
+void LuaStateManager::logErrorsFromStack(bool throwOnError) const
 {
   std::string msg = lua_tostring(m_state, -1);
 
@@ -194,6 +211,11 @@ void LuaStateManager::logErrorsFromStack() const
   lua_pop(m_state, 1);
 
   logLuaError(msg);
+
+  if (throwOnError)
+  {
+    throw LuaGenericException(msg);
+  }
 }
 
 void LuaStateManager::logLuaError(const std::string& message) const
@@ -210,10 +232,10 @@ void LuaStateManager::logLuaError(const std::string& message) const
   UTILS_LOG_FATAL(log);
 }
 
-bool LuaStateManager::executeCode(const std::string& fileOrString, ExecuteMode mode)
+bool LuaStateManager::executeCode(const std::string& fileOrString, ExecuteMode mode, RethrowErrors rethrowErrors)
 {
   auto success = true;
-  safeExecute([this, mode, &success, &fileOrString]()
+  safeExecute([this, mode, rethrowErrors, &success, &fileOrString]()
   {
     auto result = 0;
     if (mode == ExecuteMode::File)
@@ -234,10 +256,10 @@ bool LuaStateManager::executeCode(const std::string& fileOrString, ExecuteMode m
 
     if (result != LUA_OK)
     {
-      logErrorsFromStack();
+      logErrorsFromStack(rethrowErrors == RethrowErrors::YES);
       success = false;
     }
-  });
+  }, rethrowErrors);
 
   return success;
 }
